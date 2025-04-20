@@ -52,7 +52,7 @@ async function main() {
 
     // Render the current state
     draw();
-    window.render(w, h, w * 4, "rgba32", canvas.data());
+    window.render(w, h, w * 4, "rgba32", canvas.data(), { scaling: "linear" });
 
     // Calculate time taken for frame and sleep if necessary
     const frameTime = performance.now() - currentTime;
