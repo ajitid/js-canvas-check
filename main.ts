@@ -34,6 +34,7 @@ async function setup() {
   updateCanvas()
   // there's "expose" event too but it doesn't give anything
   globalThis.window.on('resize', updateParams)
+  globalThis.imageAssets = new Map()
   return true
 }
 

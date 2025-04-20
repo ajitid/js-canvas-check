@@ -12,4 +12,6 @@ declare global {
   var pxh: number
   var c: CanvasRenderingContext2D
   var counter: number
+  // {category : {name : asset}}
+  var imageAssets: Map<string, Map<string, Image>>
 }
