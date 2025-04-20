@@ -3,29 +3,31 @@ import sdl from '@kmamal/sdl'
 import { createCanvas } from '@napi-rs/canvas'
 
 function updateCanvas() {
-  if (canvas == null) {
-    canvas = createCanvas(pxw, pxh)
-    c = canvas.getContext('2d')
+  if (globalThis.canvas == null) {
+    globalThis.canvas = createCanvas(globalThis.pxw, globalThis.pxh)
+    globalThis.c = globalThis.canvas.getContext('2d')
   }
-  canvas.width = pxw
-  canvas.height = pxh
+  globalThis.canvas.width = pxw
+  globalThis.canvas.height = pxh
 
-  c.resetTransform()
-  c.scale(pxw / w, pxh / h)
+  globalThis.c.resetTransform()
+  globalThis.c.scale(pxw / w, pxh / h)
 }
 
 async function setup() {
-  window = sdl.video.createWindow({
+  if (globalThis.window != null) return false
+  globalThis.window = sdl.video.createWindow({
     title: 'Canvas2D',
     x: 0,
     y: 30,
     resizable: true,
   })
-  w = window.width
-  h = window.height
-  pxw = window.pixelWidth
-  pxh = window.pixelHeight
+  globalThis.w = globalThis.window.width
+  globalThis.h = globalThis.window.height
+  globalThis.pxw = globalThis.window.pixelWidth
+  globalThis.pxh = globalThis.window.pixelHeight
   updateCanvas()
+  return true
 }
 
 const targetFPS = 60
@@ -34,18 +36,21 @@ const maxFrameSkip = 4
 const fixedTimeStep = 1000 / 60 // in milliseconds
 
 function updateParams(ctx: sdl.Events.Window.Resize) {
-  w = ctx.width
-  h = ctx.height
-  pxw = ctx.pixelWidth
-  pxh = ctx.pixelHeight
+  globalThis.w = ctx.width
+  globalThis.h = ctx.height
+  globalThis.pxw = ctx.pixelWidth
+  globalThis.pxh = ctx.pixelHeight
   updateCanvas()
 }
 
 async function main() {
-  await setup()
+  const firstTime = await setup()
+  if (!firstTime) {
+    return
+  }
 
   // there's "expose" event too but it doesn't give anything
-  window.on('resize', updateParams)
+  globalThis.window.on('resize', updateParams)
 
   let previousTime = performance.now()
   let lag = 0
@@ -95,6 +100,7 @@ function update(fixedTimeStep: number) {}
 
 let displayFPSPrev = performance.now()
 export function draw() {
+  const { c } = globalThis
   // clear canvas:
 
   // TODO add this when using skia-canvas
@@ -107,7 +113,7 @@ export function draw() {
 
   // draw commands:
 
-  c.fillStyle = 'pink'
+  c.fillStyle = 'blue'
   c.fillRect(0, 0, w, h)
 
   c.fillStyle = 'white'
