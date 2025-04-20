@@ -1,3 +1,5 @@
+import { img } from './assets'
+
 let displayFPSPrev = performance.now()
 
 export function draw() {
@@ -10,11 +12,13 @@ export function draw() {
 
   // draw commands:
 
+  c.drawImage(img, 0, 0)
+
   showFps()
 }
 
 function showFps() {
-  c.fillStyle = 'white'
+  c.fillStyle = 'black'
   c.font = '18px Inter'
   const now = performance.now()
   c.fillText((1000 / (now - displayFPSPrev)).toFixed(2), 40, 40)

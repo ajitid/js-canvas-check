@@ -1,1 +1,3 @@
-import { loadImage } from 'skia-canvas'
+import { loadImage, Image } from 'skia-canvas'
+
+export const img = await loadImage('./anime-girl.svg')
