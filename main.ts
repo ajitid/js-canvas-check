@@ -1,16 +1,6 @@
 import { setImmediate, setTimeout } from "node:timers/promises";
-
 import sdl from "@kmamal/sdl";
-import { createCanvas, type Canvas, type SKRSContext2D } from "@napi-rs/canvas";
-// import { draw } from "./draw";
-
-let window: sdl.Sdl.Video.Window,
-  canvas: Canvas,
-  w: number,
-  h: number,
-  pxw: number,
-  pxh: number,
-  c: SKRSContext2D;
+import { createCanvas } from "@napi-rs/canvas";
 
 function updateCanvas() {
   if (canvas == null) {
