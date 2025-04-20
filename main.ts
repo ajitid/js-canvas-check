@@ -8,14 +8,21 @@ let window: sdl.Sdl.Video.Window,
   canvas: Canvas,
   w: number,
   h: number,
+  pxw: number,
+  pxh: number,
   c: SKRSContext2D;
 
 async function setup() {
   window = sdl.video.createWindow({ title: "Canvas2D", x: 0, y: 30 });
   w = window.width;
   h = window.height;
+  pxw = window.pixelWidth;
+  pxh = window.pixelHeight;
   canvas = createCanvas(w, h);
   c = canvas.getContext("2d");
+
+  c.resetTransform();
+  c.scale(pxw / w, pxh / h);
 }
 
 const targetFPS = 60;
@@ -52,7 +59,7 @@ async function main() {
 
     // Render the current state
     draw();
-    window.render(w, h, w * 4, "rgba32", canvas.data(), { scaling: "linear" });
+    window.render(pxw, pxh, pxw * 4, "rgba32", canvas.data());
 
     // Calculate time taken for frame and sleep if necessary
     const frameTime = performance.now() - currentTime;
@@ -82,6 +89,9 @@ export function draw() {
   // ctx.fillRect(0, 0, width, height);
 
   // draw commands:
+
+  c.fillStyle = "pink";
+  c.fillRect(0, 0, w, h);
 
   c.fillStyle = "white";
 
