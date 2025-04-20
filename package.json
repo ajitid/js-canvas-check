@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@kmamal/sdl": "^0.11.7",
-    "skia-canvas": "^2.0.2"
+    "@napi-rs/canvas": "^0.1.69"
   },
   "trustedDependencies": [
     "@kmamal/sdl",

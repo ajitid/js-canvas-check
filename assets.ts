@@ -1,1 +1,1 @@
-import { loadImage } from 'skia-canvas'
+import { loadImage } from '@napi-rs/canvas'

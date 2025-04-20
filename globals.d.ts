@@ -1,5 +1,5 @@
 import type { Sdl } from '@kmamal/sdl'
-import type { Canvas, CanvasRenderingContext2D } from 'skia-canvas'
+import type { Canvas, SKRSContext2D, Image } from '@napi-rs/canvas'
 
 export {}
 
@@ -10,7 +10,7 @@ declare global {
   var h: number
   var pxw: number
   var pxh: number
-  var c: CanvasRenderingContext2D
+  var c: SKRSContext2D
   var counter: number
   // {category : {name : asset}}
   var imageAssets: Map<string, Map<string, Image>>
