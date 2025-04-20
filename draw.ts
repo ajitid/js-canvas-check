@@ -14,7 +14,7 @@ export function draw() {
 
   // draw commands:
 
-  c.fillStyle = 'blue'
+  c.fillStyle = 'purple'
   c.fillRect(0, 0, w, h)
 
   c.fillStyle = 'white'

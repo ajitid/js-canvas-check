@@ -16,6 +16,9 @@ function updateCanvas() {
 }
 
 async function setup() {
+  globalThis.counter ??= 0
+  globalThis.counter++
+  globalThis.counter %= 10000
   if (globalThis.window != null) return false
   globalThis.window = sdl.video.createWindow({
     title: 'Canvas2D',
@@ -28,6 +31,8 @@ async function setup() {
   globalThis.pxw = globalThis.window.pixelWidth
   globalThis.pxh = globalThis.window.pixelHeight
   updateCanvas()
+  // there's "expose" event too but it doesn't give anything
+  globalThis.window.on('resize', updateParams)
   return true
 }
 
@@ -46,16 +51,11 @@ function updateParams(ctx: sdl.Events.Window.Resize) {
 
 async function main() {
   const firstTime = await setup()
-  if (!firstTime) {
-    return
-  }
-
-  // there's "expose" event too but it doesn't give anything
-  globalThis.window.on('resize', updateParams)
+  const currentCount = globalThis.counter
 
   let previousTime = performance.now()
   let lag = 0
-  while (!window.destroyed) {
+  while (!window.destroyed && globalThis.counter === currentCount) {
     const currentTime = performance.now()
     const elapsed = currentTime - previousTime
     previousTime = currentTime

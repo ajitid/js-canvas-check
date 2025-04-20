@@ -11,4 +11,5 @@ declare global {
   var pxw: number
   var pxh: number
   var c: SKRSContext2D
+  var counter: number
 }
