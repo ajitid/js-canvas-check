@@ -18,7 +18,6 @@ async function setup() {
   c = canvas.getContext("2d");
 }
 
-// from https://claude.ai/chat/bded8858-2ac5-4729-a030-ead81648cc61 and https://grok.com/chat/4c22c406-9d8a-44d2-9c47-a719d7d3c1da
 const targetFPS = 60;
 const targetDeltaTime = 1000 / targetFPS; // in milliseconds
 const maxFrameSkip = 4;
@@ -61,8 +60,6 @@ async function main() {
     if (sleepTime > 0) {
       await setTimeout(sleepTime);
     } else {
-      // after referring to this, I think it makes sense to use
-      // setImmediate instead https://claude.ai/chat/2d3e9f34-2c96-4386-bee6-b84fd8e5dc31
       await setImmediate();
     }
   }
