@@ -1,32 +1,22 @@
 let displayFPSPrev = performance.now()
 
 export function draw() {
-  const { c } = globalThis
+  const { c, w, h } = globalThis
   // clear canvas:
 
-  // TODO add this when using skia-canvas
-  // ctx.reset();
-
-  c.clearRect(0, 0, w, h)
-  // or
-  // ctx.fillStyle = "black";
-  // ctx.fillRect(0, 0, width, height);
-
-  // draw commands:
-
+  c.reset()
   c.fillStyle = 'black'
   c.fillRect(0, 0, w, h)
 
+  // draw commands:
+
+  showFps()
+}
+
+function showFps() {
   c.fillStyle = 'white'
-
-  // c.font = 'Inter 44px'
-  c.font = '44px Inter'
-  c.fillText((64.23).toFixed(2), 40, 40)
-
-  /*
-  c.font = 'Inter 44px'
+  c.font = '18px Inter'
   const now = performance.now()
   c.fillText((1000 / (now - displayFPSPrev)).toFixed(2), 40, 40)
   displayFPSPrev = now
-  */
 }

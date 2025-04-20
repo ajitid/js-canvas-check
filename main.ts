@@ -7,6 +7,7 @@ function updateCanvas() {
   if (globalThis.canvas == null) {
     globalThis.canvas = new Canvas(globalThis.pxw, globalThis.pxh)
     globalThis.c = globalThis.canvas.getContext('2d')
+    c.fontHinting = true
   }
   globalThis.canvas.width = pxw
   globalThis.canvas.height = pxh
@@ -79,6 +80,7 @@ async function main() {
 
     // Render the current state
     draw()
+    // `canvas.toBufferSync()`'s default color type is 'RGBA8888', which matches with SDL's 'rgba32'
     window.render(pxw, pxh, pxw * 4, 'rgba32', canvas.toBufferSync('raw'), {
       scaling: 'linear',
       dstRect: { x: 0, y: 0, width: pxw, height: pxh },
