@@ -1,5 +1,5 @@
 import type { Sdl } from '@kmamal/sdl'
-import type { Canvas, SKRSContext2D } from '@napi-rs/canvas'
+import type { Canvas, CanvasRenderingContext2D } from 'skia-canvas'
 
 export {}
 
@@ -10,6 +10,6 @@ declare global {
   var h: number
   var pxw: number
   var pxh: number
-  var c: SKRSContext2D
+  var c: CanvasRenderingContext2D
   var counter: number
 }

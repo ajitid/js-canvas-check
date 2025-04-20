@@ -1,11 +1,11 @@
 import { setImmediate, setTimeout } from 'node:timers/promises'
 import sdl from '@kmamal/sdl'
-import { createCanvas } from '@napi-rs/canvas'
+import { Canvas } from 'skia-canvas'
 import { draw } from './draw'
 
 function updateCanvas() {
   if (globalThis.canvas == null) {
-    globalThis.canvas = createCanvas(globalThis.pxw, globalThis.pxh)
+    globalThis.canvas = new Canvas(globalThis.pxw, globalThis.pxh)
     globalThis.c = globalThis.canvas.getContext('2d')
   }
   globalThis.canvas.width = pxw
@@ -79,7 +79,7 @@ async function main() {
 
     // Render the current state
     draw()
-    window.render(pxw, pxh, pxw * 4, 'rgba32', canvas.data(), {
+    window.render(pxw, pxh, pxw * 4, 'rgba32', canvas.toBufferSync('raw'), {
       scaling: 'linear',
       dstRect: { x: 0, y: 0, width: pxw, height: pxh },
     })

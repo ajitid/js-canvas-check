@@ -19,8 +19,8 @@ export function draw() {
 
   c.fillStyle = 'white'
 
-  c.font = 'Inter 44px'
-  // c.font = '44px Inter'
+  // c.font = 'Inter 44px'
+  c.font = '44px Inter'
   c.fillText((64.23).toFixed(2), 40, 40)
 
   /*
