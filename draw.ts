@@ -14,13 +14,19 @@ export function draw() {
 
   // draw commands:
 
-  c.fillStyle = 'purple'
+  c.fillStyle = 'black'
   c.fillRect(0, 0, w, h)
 
   c.fillStyle = 'white'
 
   c.font = 'Inter 44px'
+  // c.font = '44px Inter'
+  c.fillText((64.23).toFixed(2), 40, 40)
+
+  /*
+  c.font = 'Inter 44px'
   const now = performance.now()
   c.fillText((1000 / (now - displayFPSPrev)).toFixed(2), 40, 40)
   displayFPSPrev = now
+  */
 }
