@@ -12,17 +12,30 @@ let window: sdl.Sdl.Video.Window,
   pxh: number,
   c: SKRSContext2D;
 
+function updateCanvas() {
+  if (canvas == null) {
+    canvas = createCanvas(pxw, pxh);
+    c = canvas.getContext("2d");
+  }
+  canvas.width = pxw;
+  canvas.height = pxh;
+
+  c.resetTransform();
+  c.scale(pxw / w, pxh / h);
+}
+
 async function setup() {
-  window = sdl.video.createWindow({ title: "Canvas2D", x: 0, y: 30 });
+  window = sdl.video.createWindow({
+    title: "Canvas2D",
+    x: 0,
+    y: 30,
+    resizable: true,
+  });
   w = window.width;
   h = window.height;
   pxw = window.pixelWidth;
   pxh = window.pixelHeight;
-  canvas = createCanvas(w, h);
-  c = canvas.getContext("2d");
-
-  c.resetTransform();
-  c.scale(pxw / w, pxh / h);
+  updateCanvas();
 }
 
 const targetFPS = 60;
@@ -30,8 +43,19 @@ const targetDeltaTime = 1000 / targetFPS; // in milliseconds
 const maxFrameSkip = 4;
 const fixedTimeStep = 1000 / 60; // in milliseconds
 
+function updateParams(ctx: sdl.Events.Window.Resize) {
+  w = ctx.width;
+  h = ctx.height;
+  pxw = ctx.pixelWidth;
+  pxh = ctx.pixelHeight;
+  updateCanvas();
+}
+
 async function main() {
   await setup();
+
+  // there's "expose" event too but it doesn't give anything
+  window.on("resize", updateParams);
 
   let previousTime = performance.now();
   let lag = 0;
