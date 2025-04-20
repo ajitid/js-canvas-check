@@ -12,8 +12,8 @@ let window: sdl.Sdl.Video.Window,
 
 async function setup() {
   window = sdl.video.createWindow({ title: "Canvas2D", x: 0, y: 30 });
-  w = window.pixelWidth;
-  h = window.pixelHeight;
+  w = window.width;
+  h = window.height;
   canvas = createCanvas(w, h);
   c = canvas.getContext("2d");
 }
