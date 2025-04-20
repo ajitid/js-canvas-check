@@ -1,50 +1,51 @@
 import promises from "node:fs/promises";
 import { join } from "node:path";
-import { createCanvas, loadImage } from "@napi-rs/canvas";
+import { setImmediate, setTimeout } from "node:timers/promises";
 
-const canvas = createCanvas(300, 320);
-const ctx = canvas.getContext("2d");
+import sdl from "@kmamal/sdl";
+import { createCanvas, type SKRSContext2D } from "@napi-rs/canvas";
+// import { draw } from "./draw";
 
-ctx.lineWidth = 10;
-ctx.strokeStyle = "#03a9f4";
-ctx.fillStyle = "#03a9f4";
+async function setup() {
+  const window = sdl.video.createWindow({ title: "Canvas2D", x: 0, y: 30 });
+  const { pixelWidth: width, pixelHeight: height } = window;
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext("2d");
+  return { window, canvas, ctx, width, height };
+}
 
-ctx.clip;
-// Wall
-ctx.strokeRect(75, 140, 150, 110);
-
-// Door
-ctx.fillRect(130, 190, 40, 60);
-
-// Roof
-ctx.beginPath();
-ctx.moveTo(50, 140);
-ctx.lineTo(150, 60);
-ctx.lineTo(250, 140);
-ctx.closePath();
-ctx.stroke();
+/*
+setup/init
+update
+draw/render
+^ take from love2d and raylib
+*/
 
 async function main() {
-  // load images from disk or from a URL
-  // const catImage = await loadImage(
-  //   "../../../../Music/mymusic/5 Seconds of Summer/poster.jpg"
-  // );
-  // const dogImage = await loadImage("https://example.com/path/to/dog.jpg");
+  const { window, canvas, ctx, width, height } = await setup();
+  while (!window.destroyed) {
+    // TODO add this when using skia-canvas
+    // ctx.reset();
+    draw(ctx, width, height);
+    window.render(width, height, width * 4, "rgba32", canvas.data());
+    await setImmediate();
+  }
+}
 
-  // ctx.drawImage(catImage, 0, 0, catImage.width, catImage.height);
+let t = performance.now();
 
-  // ctx.drawImage(
-  //   dogImage,
-  //   canvas.width / 2,
-  //   canvas.height / 2,
-  //   dogImage.width,
-  //   dogImage.height
-  // );
+export function draw(ctx: SKRSContext2D, width: number, height: number) {
+  ctx.clearRect(0, 0, width, height);
+  // or
+  // ctx.fillStyle = "black";
+  // ctx.fillRect(0, 0, width, height);
 
-  // export canvas as image
-  const pngData = await canvas.encode("png"); // JPEG, AVIF and WebP are also supported
-  // encoding in libuv thread pool, non-blocking
-  await promises.writeFile(join(__dirname, "simple.png"), pngData);
+  ctx.fillStyle = "white";
+
+  ctx.font = "Inter 44px";
+  const now = performance.now();
+  ctx.fillText((now - t).toString(), 40, 40);
+  t = now;
 }
 
 main();
