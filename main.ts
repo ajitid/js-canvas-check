@@ -1,6 +1,6 @@
 import { setImmediate, setTimeout } from 'node:timers/promises'
 import sdl from '@kmamal/sdl'
-import { Canvas } from 'skia-canvas'
+import { createCanvas } from '@napi-rs/canvas'
 import { draw } from './draw'
 import './debug'
 
@@ -45,9 +45,48 @@ function updateParams(ctx: sdl.Events.Window.Resize) {
 
 function updateCanvas() {
   if (canvas == null) {
-    canvas = new Canvas(pixelWidth, pixelHeight)
+    canvas = createCanvas(pixelWidth, pixelHeight)
     canvasContext = canvas.getContext('2d')
-    canvasContext.fontHinting = true
+
+    // FIXME
+    // c.reset()'s definition is present, but call is absent
+    // missing from @napi-rs/canvas so using it this way.
+    canvasContext.reset = function reset() {
+      const { canvasContext: c } = globalThis
+
+      c.clearRect(0, 0, width, height)
+
+      // Reset transformation matrix to identity
+      c.setTransform(1, 0, 0, 1, 0, 0)
+
+      // Reset all drawing state variables to their default values
+      c.globalAlpha = 1.0
+      c.globalCompositeOperation = 'source-over'
+      c.strokeStyle = '#000000'
+      c.fillStyle = '#000000'
+      c.shadowOffsetX = 0
+      c.shadowOffsetY = 0
+      c.shadowBlur = 0
+      c.shadowColor = 'rgba(0, 0, 0, 0)'
+      c.lineWidth = 1
+      c.lineCap = 'butt'
+      c.lineJoin = 'miter'
+      c.miterLimit = 10
+      c.lineDashOffset = 0
+      c.font = '10px sans-serif'
+      c.textAlign = 'start'
+      c.textBaseline = 'alphabetic'
+      c.direction = 'inherit'
+      c.imageSmoothingEnabled = true
+
+      // Reset any custom line dash setting
+      if (c.setLineDash) {
+        c.setLineDash([])
+      }
+
+      // Clear any current path
+      c.beginPath()
+    }
   }
   canvas.width = pixelWidth
   canvas.height = pixelHeight
@@ -91,15 +130,11 @@ async function main() {
 
     // Render the current state
     draw()
-    // `canvas.toBufferSync()`'s default color type is 'RGBA8888', which matches with SDL's 'rgba32'
-    window.render(
-      pixelWidth,
-      pixelHeight,
-      pixelWidth * 4,
-      'rgba32',
-      canvas.toBufferSync('raw'),
-      { scaling: 'linear', dstRect: { x: 0, y: 0, width: pixelWidth, height: pixelHeight } }
-    )
+    // `canvas.data()`'s color type is 'RGBA8888', which matches with SDL's 'rgba32'
+    window.render(pixelWidth, pixelHeight, pixelWidth * 4, 'rgba32', canvas.data(), {
+      scaling: 'linear',
+      dstRect: { x: 0, y: 0, width: pixelWidth, height: pixelHeight },
+    })
 
     // Calculate time taken for frame and sleep if necessary
     const frameTime = performance.now() - currentTime
