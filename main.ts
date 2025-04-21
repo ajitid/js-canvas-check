@@ -1,80 +1,59 @@
 import { setImmediate, setTimeout } from 'node:timers/promises'
 import sdl from '@kmamal/sdl'
-import { createCanvas } from '@napi-rs/canvas'
+import { Canvas } from 'skia-canvas'
 import { draw } from './draw'
+import './debug'
 
-function updateCanvas() {
-  if (globalThis.canvas == null) {
-    globalThis.canvas = createCanvas(globalThis.pxw, globalThis.pxh)
-    globalThis.c = globalThis.canvas.getContext('2d')
-
-    // FIXME
-    // c.reset()'s definition is present, but call is absent
-    // missing from @napi-rs/canvas so using it this way.
-    globalThis.c.reset = function reset() {
-      const { c } = globalThis
-
-      c.clearRect(0, 0, globalThis.w, globalThis.h)
-
-      // Reset transformation matrix to identity
-      c.setTransform(1, 0, 0, 1, 0, 0)
-
-      // Reset all drawing state variables to their default values
-      c.globalAlpha = 1.0
-      c.globalCompositeOperation = 'source-over'
-      c.strokeStyle = '#000000'
-      c.fillStyle = '#000000'
-      c.shadowOffsetX = 0
-      c.shadowOffsetY = 0
-      c.shadowBlur = 0
-      c.shadowColor = 'rgba(0, 0, 0, 0)'
-      c.lineWidth = 1
-      c.lineCap = 'butt'
-      c.lineJoin = 'miter'
-      c.miterLimit = 10
-      c.lineDashOffset = 0
-      c.font = '10px sans-serif'
-      c.textAlign = 'start'
-      c.textBaseline = 'alphabetic'
-      c.direction = 'inherit'
-      c.imageSmoothingEnabled = true
-
-      // Reset any custom line dash setting
-      if (c.setLineDash) {
-        c.setLineDash([])
-      }
-
-      // Clear any current path
-      c.beginPath()
-    }
-  }
-  globalThis.canvas.width = pxw
-  globalThis.canvas.height = pxh
-
-  globalThis.c.resetTransform()
-  globalThis.c.scale(pxw / w, pxh / h)
-}
+const nil: any = null
+globalThis.window = nil
+globalThis.canvas = nil
+globalThis.width = 4
+globalThis.height = 4
+globalThis.pixelWidth = 4
+globalThis.pixelHeight = 4
+globalThis.canvasContext = nil
+globalThis.counter = 0
+globalThis.imageAssets = new Map()
 
 async function setup() {
-  globalThis.counter ??= 0
-  globalThis.counter++
-  globalThis.counter %= 10000
-  if (globalThis.window != null) return false
-  globalThis.window = sdl.video.createWindow({
+  counter++
+  counter %= 10000
+  if (window != null) return false
+  window = sdl.video.createWindow({
     title: 'Canvas2D',
     x: 0,
     y: 30,
     resizable: true,
   })
-  globalThis.w = globalThis.window.width
-  globalThis.h = globalThis.window.height
-  globalThis.pxw = globalThis.window.pixelWidth
-  globalThis.pxh = globalThis.window.pixelHeight
+  width = window.width
+  height = window.height
+  pixelWidth = window.pixelWidth
+  pixelHeight = window.pixelHeight
   updateCanvas()
   // there's "expose" event too but it doesn't give anything
-  globalThis.window.on('resize', updateParams)
-  globalThis.imageAssets = new Map()
+  window.on('resize', updateParams)
   return true
+}
+
+function updateParams(ctx: sdl.Events.Window.Resize) {
+  width = ctx.width
+  height = ctx.height
+  pixelWidth = ctx.pixelWidth
+  pixelHeight = ctx.pixelHeight
+  updateCanvas()
+}
+
+function updateCanvas() {
+  if (canvas == null) {
+    canvas = new Canvas(pixelWidth, pixelHeight)
+    canvasContext = canvas.getContext('2d')
+    canvasContext.fontHinting = true
+  }
+  canvas.width = pixelWidth
+  canvas.height = pixelHeight
+
+  canvasContext.resetTransform()
+  canvasContext.scale(pixelWidth / width, pixelHeight / height)
 }
 
 const targetFPS = 60
@@ -82,21 +61,13 @@ const targetDeltaTime = 1000 / targetFPS // in milliseconds
 const maxFrameSkip = 4
 const fixedTimeStep = 1000 / 60 // in milliseconds
 
-function updateParams(ctx: sdl.Events.Window.Resize) {
-  globalThis.w = ctx.width
-  globalThis.h = ctx.height
-  globalThis.pxw = ctx.pixelWidth
-  globalThis.pxh = ctx.pixelHeight
-  updateCanvas()
-}
-
 async function main() {
   const firstTime = await setup()
-  const currentCount = globalThis.counter
+  const currentCount = counter
 
   let previousTime = performance.now()
   let lag = 0
-  while (!window.destroyed && globalThis.counter === currentCount) {
+  while (!window.destroyed && counter === currentCount) {
     const currentTime = performance.now()
     const elapsed = currentTime - previousTime
     previousTime = currentTime
@@ -121,10 +92,14 @@ async function main() {
     // Render the current state
     draw()
     // `canvas.toBufferSync()`'s default color type is 'RGBA8888', which matches with SDL's 'rgba32'
-    window.render(pxw, pxh, pxw * 4, 'rgba32', canvas.data(), {
-      scaling: 'linear',
-      dstRect: { x: 0, y: 0, width: pxw, height: pxh },
-    })
+    window.render(
+      pixelWidth,
+      pixelHeight,
+      pixelWidth * 4,
+      'rgba32',
+      canvas.toBufferSync('raw'),
+      { scaling: 'linear', dstRect: { x: 0, y: 0, width: pixelWidth, height: pixelHeight } }
+    )
 
     // Calculate time taken for frame and sleep if necessary
     const frameTime = performance.now() - currentTime
