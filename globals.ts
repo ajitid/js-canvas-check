@@ -1,0 +1,10 @@
+const nil: any = null
+globalThis.window = nil
+globalThis.canvas = nil
+globalThis.width = 4
+globalThis.height = 4
+globalThis.pixelWidth = 4
+globalThis.pixelHeight = 4
+globalThis.canvasContext = nil
+globalThis.counter = 0
+globalThis.imageAssets = new Map()

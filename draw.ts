@@ -1,6 +1,12 @@
-import { img } from './assets'
-
 let prevTimestamp = performance.now()
+
+let minFps = Infinity,
+  maxFps = 0
+setInterval(() => {
+  console.log(minFps, maxFps)
+  minFps = Infinity
+  maxFps = 0
+}, 2000)
 
 export function draw() {
   const c = canvasContext,
@@ -13,20 +19,25 @@ export function draw() {
   c.fillRect(0, 0, w, h)
 
   // draw commands:
-  c.drawImage(img, 0, 0)
+  c.fillStyle = 'violet'
+  c.arc(w / 2, h / 2, w / 4, 0, 2 * Math.PI)
+  c.fill()
 
   // show stats:
   showFps()
 }
 
 function showFps() {
-  const c = canvasContext,
-    w = width,
-    h = height
+  const c = canvasContext
 
   c.fillStyle = 'white'
   c.font = '18px Inter'
   const now = performance.now()
-  c.fillText((1000 / (now - prevTimestamp)).toFixed(2), 40, 40)
+  const fpsStr = (1000 / (now - prevTimestamp)).toFixed(2)
+  c.fillText(fpsStr, 40, 40)
   prevTimestamp = now
+
+  const fps = parseFloat(fpsStr)
+  minFps = Math.min(minFps, fps)
+  maxFps = Math.max(maxFps, fps)
 }
